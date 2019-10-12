@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Language">
+        <file>C_I18N_en_UK.qm</file>
+    </qresource>
+</RCC>
