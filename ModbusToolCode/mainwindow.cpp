@@ -32,8 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
     curr_progressbar_maxinum = 100;
     progressbar->setValue(0);
     progressbar->setFormat(tr("未连接"));
-    progressbar->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);  // 对齐方式
+    progressbar->setAlignment(Qt::AlignRight | Qt::AlignVCenter);  // 对齐方式
     ui->statusBar->addPermanentWidget(progressbar);
+    error_tip_label = new QLabel(this);
+    error_tip_label->setMaximumHeight(30);
+    error_tip_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);  // 对齐方式
+    ui->statusBar->addWidget(error_tip_label);
     //this->setGeometry(QApplication::desktop()->availableGeometry());
 
     QStandardItemModel *model = new QStandardItemModel();
@@ -66,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,&MainWindow::Stop_Thread_Signal,serial,&Serial::Stop_Thread);
     connect(this,&MainWindow::Open_Com_Signal,serial,&Serial::open_com);
     connect(serial,&Serial::Data_Updata_Signal,this,&MainWindow::Data_Updata_Slot);
+    connect(serial,&Serial::Error_Tip_Signal,this,&MainWindow::Error_Tip_Slot);
     thread->start();
 
 }
@@ -94,7 +99,7 @@ void MainWindow::Comm_Set_Info_Receive(QVariant& v)
 
 void MainWindow::closeEvent(QCloseEvent *)
 {
-
+    serial->deleteLater();
     emit CloseSignal();
     this->deleteLater();
 }
@@ -102,7 +107,6 @@ void MainWindow::closeEvent(QCloseEvent *)
 void MainWindow::DbNameSlot(QString arg)
 {
     DbName = arg;
-    qDebug()<<DbName;
     init();
 }
 
@@ -249,6 +253,7 @@ void MainWindow::init()
                    x++;
                }
                scene_items_num_list.append(x);  //各个画面对应的信号数
+
                x = 0;
            }
         }
@@ -335,15 +340,17 @@ void MainWindow::init()
 void MainWindow::on_treeView_clicked(const QModelIndex &index)
 {
     int scene_id = -1;
-    QStandardItemModel* model = dynamic_cast<QStandardItemModel *>(ui->tableView->model());
-    if(scene_in_use_name.indexOf(index.data().toString()) != -1)
+    QAbstractItemModel* model = ui->tableView->model();
+    if(scene_in_use_name.contains(index.data().toString()))
+    {
         scene_id = scene_in_use_id.at(scene_in_use_name.indexOf(index.data().toString()));
+    }
     if(scene_id != -1)
     {
-        for(int i = 0; i <=model->rowCount()+1; i++)
+        int cnt = model->rowCount();
+        for(int i = 0; i <= cnt+1; i++)
             model->removeRow(0);
         int pos = scene_zone_id_list.indexOf(scene_id);
-
         progressbar->setMinimum(0);
         progressbar->setMaximum(scene_items_num_list.at(pos));
         curr_progressbar_maxinum = scene_items_num_list.at(pos);
@@ -376,7 +383,8 @@ void MainWindow::on_treeView_clicked(const QModelIndex &index)
         serial->cnt = 0;
     }
     else{
-        for(int i = 0; i <=model->rowCount()+1; i++)
+        int cnt = model->rowCount();
+        for(int i = 0; i <= cnt+1; i++)
             model->removeRow(0);
     }
 }
@@ -422,6 +430,12 @@ void MainWindow::Data_Updata_Slot(int cnt)
     }
 }
 
+void MainWindow::Error_Tip_Slot(QString str)
+{
+    error_tip_label->setText(str);
+}
+
+
 void MainWindow::Property_Choice_Receive(QString s)
 {
     QStringList slist = Signal_Info_Property(Clicked_Signal.property);
@@ -434,8 +448,8 @@ void MainWindow::Property_Choice_Receive(QString s)
             float v = value/Clicked_Signal.factor;
             QString sNum = QString::number(v);
             value = sNum.toShort();
-            Write_Value[0] = uchar((value>>8)&0xff);
-            Write_Value[1] = uchar(value&0xff);
+            Write_Value[0] = char((value>>8)&0xff);
+            Write_Value[1] = char(value&0xff);
             serial->Write_FLAG = 1;
         }
         break;
@@ -445,8 +459,8 @@ void MainWindow::Property_Choice_Receive(QString s)
             float v = value/Clicked_Signal.factor;
             QString sNum = QString::number(v);
             value = sNum.toUShort();
-            Write_Value[0] = uchar((value>>8)&0xff);
-            Write_Value[1] = uchar(value&0xff);
+            Write_Value[0] = char((value>>8)&0xff);
+            Write_Value[1] = char(value&0xff);
             serial->Write_FLAG = 1;
         }
         break;
@@ -459,10 +473,10 @@ void MainWindow::Property_Choice_Receive(QString s)
             float v = value/Clicked_Signal.factor;
             QString sNum = QString::number(v);
             value = sNum.toInt();
-            Write_Value[0] = uchar((value>>24)&0xff);
-            Write_Value[1] = uchar((value>>16)&0xff);
-            Write_Value[2] = uchar((value>>8)&0xff);
-            Write_Value[3] = uchar(value&0xff);
+            Write_Value[0] = char((value>>24)&0xff);
+            Write_Value[1] = char((value>>16)&0xff);
+            Write_Value[2] = char((value>>8)&0xff);
+            Write_Value[3] = char(value&0xff);
             serial->Write_FLAG = 1;
         }
         break;
@@ -475,10 +489,10 @@ void MainWindow::Property_Choice_Receive(QString s)
             float v = value/Clicked_Signal.factor;
             QString sNum = QString::number(v);
             value = sNum.toUInt();
-            Write_Value[0] = uchar((value>>24)&0xff);
-            Write_Value[1] = uchar((value>>16)&0xff);
-            Write_Value[2] = uchar((value>>8)&0xff);
-            Write_Value[3] = uchar(value&0xff);
+            Write_Value[0] = char((value>>24)&0xff);
+            Write_Value[1] = char((value>>16)&0xff);
+            Write_Value[2] = char((value>>8)&0xff);
+            Write_Value[3] = char(value&0xff);
             serial->Write_FLAG = 1;
         }
         break;
@@ -491,10 +505,10 @@ void MainWindow::Property_Choice_Receive(QString s)
             value = value/Clicked_Signal.factor;
             QString sNum = QString::number(value);
             int v = sNum.toInt();
-            Write_Value[0] = uchar((v>>24)&0xff);
-            Write_Value[1] = uchar((v>>16)&0xff);
-            Write_Value[2] = uchar((v>>8)&0xff);
-            Write_Value[3] = uchar(v&0xff);
+            Write_Value[0] = char((v>>24)&0xff);
+            Write_Value[1] = char((v>>16)&0xff);
+            Write_Value[2] = char((v>>8)&0xff);
+            Write_Value[3] = char(v&0xff);
             serial->Write_FLAG = 1;
         }
         break;
@@ -504,8 +518,24 @@ void MainWindow::Property_Choice_Receive(QString s)
             serial->Write_FLAG = 1;
         }
         break;
+        case 15:   //datetime(abcdef)
+        {
+            //时间类型没有枚举
+        }
+        break;
 
     }
+}
+
+void MainWindow::DataTime_Slot(QDateTime datatime)  //时间设置
+{
+    Write_Value[0] = char(datatime.date().year()%2000);
+    Write_Value[1] = char(datatime.date().month());
+    Write_Value[2] = char(datatime.date().day());
+    Write_Value[3] = char(datatime.time().hour());
+    Write_Value[4] = char(datatime.time().minute());
+    Write_Value[5] = 0;
+    serial->Write_FLAG = 1;
 }
 
 QStringList MainWindow::Signal_Info_Property(QString s)
@@ -529,26 +559,31 @@ Signal_Info MainWindow::Read_Signal_info_list(int scene_zone_id,int item_pos)
 {
     int real_pos = 0;
     int pos = scene_zone_id_list.indexOf(scene_zone_id);
+
     for(int i = 0; i < pos; i++)
     {
         real_pos += scene_items_num_list.at(i);
     }
     real_pos += item_pos;
     if(real_pos > Signal_info_list.length())
-        qDebug()<<"real_pos"<<real_pos;
+    {
+        //qDebug()<<"real_pos"<<real_pos;
+        return  Signal_info_list.at(0);
+    }
     return Signal_info_list.at(real_pos);
 }
 
 void MainWindow::on_RunAction_triggered()
 {
-    if(com == "")
+    if(serial->serial == nullptr)
     {
         QMessageBox::warning(this,"Warning",tr("请先进行通讯设置"),QMessageBox::Yes);
         return;
     }
     else
     {
-
+        ui->CommAction->setEnabled(false);
+        ui->RunAction->setEnabled(false);
         emit Doworks_Signal();
     }
 }
@@ -556,6 +591,8 @@ void MainWindow::on_RunAction_triggered()
 void MainWindow::on_StopAction_triggered()   //停止线程
 {
     serial->stopped = 1;
+    ui->CommAction->setEnabled(true);
+    ui->RunAction->setEnabled(true);
     emit Stop_Thread_Signal();
 }
 
@@ -596,8 +633,16 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                        value = sNum.toShort();
                        if(ok)
                        {
-                           Write_Value[0] = uchar((value>>8)&0xff);
-                           Write_Value[1] = uchar(value&0xff);
+//                           if(LoginDialog::LowInTheFirst == true)
+//                           {
+//                               Write_Value[0] = char(value&0xff);
+//                               Write_Value[1] = char((value>>8)&0xff);
+//                           }
+//                           else
+//                           {
+                               Write_Value[0] = char((value>>8)&0xff);
+                               Write_Value[1] = char(value&0xff);
+//                          }
                            serial->Write_FLAG = 1;
                        }
 
@@ -619,8 +664,16 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                        value = sNum.toUShort();
                        if(ok)
                        {
-                           Write_Value[0] = uchar((value>>8)&0xff);
-                           Write_Value[1] = uchar(value&0xff);
+//                           if(LoginDialog::LowInTheFirst == true)
+//                           {
+//                               Write_Value[0] = char(value&0xff);
+//                               Write_Value[1] = char((value>>8)&0xff);
+//                           }
+//                           else
+//                           {
+                               Write_Value[0] = char((value>>8)&0xff);
+                               Write_Value[1] = char(value&0xff);
+//                           }
                            serial->Write_FLAG = 1;
                        }
 
@@ -645,10 +698,10 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                        value = sNum.toInt();
                        if(ok)
                        {
-                           Write_Value[0] = uchar((value>>24)&0xff);
-                           Write_Value[1] = uchar((value>>16)&0xff);
-                           Write_Value[2] = uchar((value>>8)&0xff);
-                           Write_Value[3] = uchar(value&0xff);
+                           Write_Value[0] = char((value>>24)&0xff);
+                           Write_Value[1] = char((value>>16)&0xff);
+                           Write_Value[2] = char((value>>8)&0xff);
+                           Write_Value[3] = char(value&0xff);
                            serial->Write_FLAG = 1;
                        }
 
@@ -673,10 +726,10 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                        value = sNum.toUInt();
                        if(ok)
                        {
-                           Write_Value[0] = uchar((value>>24)&0xff);
-                           Write_Value[1] = uchar((value>>16)&0xff);
-                           Write_Value[2] = uchar((value>>8)&0xff);
-                           Write_Value[3] = uchar(value&0xff);
+                           Write_Value[0] = char((value>>24)&0xff);
+                           Write_Value[1] = char((value>>16)&0xff);
+                           Write_Value[2] = char((value>>8)&0xff);
+                           Write_Value[3] = char(value&0xff);
                            serial->Write_FLAG = 1;
                        }
 
@@ -701,10 +754,10 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                        int v = sNum.toInt();
                        if(ok)
                        {
-                           Write_Value[0] = uchar((v>>24)&0xff);
-                           Write_Value[1] = uchar((v>>16)&0xff);
-                           Write_Value[2] = uchar((v>>8)&0xff);
-                           Write_Value[3] = uchar(v&0xff);
+                           Write_Value[0] = char((v>>24)&0xff);
+                           Write_Value[1] = char((v>>16)&0xff);
+                           Write_Value[2] = char((v>>8)&0xff);
+                           Write_Value[3] = char(v&0xff);
                            serial->Write_FLAG = 1;
                        }
 
@@ -718,6 +771,13 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
                             Write_Value = value.toLatin1();
                             serial->Write_FLAG = 1;
                        }
+                   }
+                   break;
+                   case 15:   //datetime(abcdef)
+                   {
+                       DataTimeDialog *w = new DataTimeDialog(this);
+                       connect(w,&DataTimeDialog::Send_DataTime_Signal,this,&MainWindow::DataTime_Slot);
+                       w->exec();
                    }
                    break;
 
@@ -736,7 +796,7 @@ void MainWindow::on_tableView_clicked(const QModelIndex &index)    //点击数�
 QVariant MainWindow::Value_Display_Process(Signal_Info s)
 {
     QStringList list_enum;
-    if(s.property != "")
+    if((s.property != "")||(!s.property.isNull()))
     {      
         QString str = s.property;
         str = str.mid(1,str.length()-7);
@@ -746,8 +806,26 @@ QVariant MainWindow::Value_Display_Process(Signal_Info s)
             QStringList list_t = list[i].split(":");
             list_enum.append(list_t);
         }
-       int pos = list_enum.indexOf(s.Value.toString());
-       return list_enum.at(pos+1);
+       if(list_enum.contains("~"))  //存在"~"符号，代表除已定义外的任何数
+       {
+           if(list_enum.contains(s.Value.toString()))
+           {
+               int pos = list_enum.indexOf(s.Value.toString());
+               return list_enum.at(pos+1);
+           }
+           else
+           {
+               int pos = list_enum.indexOf("~");
+               return list_enum.at(pos+1);
+           }
+       }
+       else
+       {
+           int pos = list_enum.indexOf(s.Value.toString());
+           return list_enum.at(pos+1);
+       }
     }
-    return s.Value;
+    else {
+        return s.Value;
+    }
 }

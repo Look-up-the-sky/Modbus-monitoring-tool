@@ -225,62 +225,67 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="353"/>
+        <location filename="addsignaldialog.ui" line="344"/>
+        <source>datetime(abcdef)</source>
+        <translation>datetime(abcdef)</translation>
+    </message>
+    <message>
+        <location filename="addsignaldialog.ui" line="358"/>
         <source>偏移量：</source>
         <translation>Offset:</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="385"/>
+        <location filename="addsignaldialog.ui" line="390"/>
         <source>范围</source>
         <translation>Range</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="397"/>
+        <location filename="addsignaldialog.ui" line="402"/>
         <source>最小值：</source>
         <translation>Minimum:</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="429"/>
+        <location filename="addsignaldialog.ui" line="434"/>
         <source>最大值：</source>
         <translation>maximum:</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="458"/>
+        <location filename="addsignaldialog.ui" line="463"/>
         <source>信号枚举显示</source>
         <translation>Signal Enum Display</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="465"/>
+        <location filename="addsignaldialog.ui" line="470"/>
         <source>Value</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="470"/>
+        <location filename="addsignaldialog.ui" line="475"/>
         <source>Display</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="490"/>
+        <location filename="addsignaldialog.ui" line="495"/>
         <source>增加</source>
         <translation>Add</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="509"/>
+        <location filename="addsignaldialog.ui" line="514"/>
         <source>删除</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="559"/>
+        <location filename="addsignaldialog.ui" line="564"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="addsignaldialog.ui" line="578"/>
+        <location filename="addsignaldialog.ui" line="583"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="addsignaldialog.cpp" line="79"/>
+        <location filename="addsignaldialog.cpp" line="175"/>
         <source>必要参数未填！</source>
         <translation>Necessary parameters not entered!</translation>
     </message>
@@ -473,124 +478,136 @@
         <translation>Scene Zone</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="294"/>
-        <location filename="mainwindow.cpp" line="302"/>
+        <location filename="mainwindow.cpp" line="297"/>
+        <location filename="mainwindow.cpp" line="305"/>
         <source>添加信号组</source>
         <translation>Add signal zone</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="295"/>
+        <location filename="mainwindow.cpp" line="298"/>
         <source>删除信号组</source>
         <translation>Delete signal zone</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="311"/>
+        <location filename="mainwindow.cpp" line="314"/>
         <source>添加信号量分组</source>
         <translation>Add signal zone</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="311"/>
-        <location filename="mainwindow.cpp" line="500"/>
+        <location filename="mainwindow.cpp" line="314"/>
+        <location filename="mainwindow.cpp" line="522"/>
         <source>请输入名称：</source>
         <translation>Please input name:</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="311"/>
+        <location filename="mainwindow.cpp" line="314"/>
         <source>newzone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="321"/>
+        <location filename="mainwindow.cpp" line="324"/>
         <source>已存在相同信号分组！</source>
         <translation>The same signal zone already exists！</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="345"/>
-        <location filename="mainwindow.cpp" line="355"/>
+        <location filename="mainwindow.cpp" line="348"/>
+        <location filename="mainwindow.cpp" line="358"/>
         <source>添加信号</source>
         <translation>Add signal</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="346"/>
+        <location filename="mainwindow.cpp" line="349"/>
         <source>删除信号</source>
         <translation>Delete signal</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="347"/>
+        <location filename="mainwindow.cpp" line="350"/>
         <source>修改信号</source>
         <translation>Modify signal</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="405"/>
-        <location filename="mainwindow.cpp" line="413"/>
+        <location filename="mainwindow.cpp" line="384"/>
+        <source>信号已被添加到画面，请先删除画面中信号！</source>
+        <translation>The signal has been added to the scene, please delete the signal in the scene first!</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="424"/>
+        <location filename="mainwindow.cpp" line="432"/>
         <source>添加</source>
         <translation>Add</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="406"/>
-        <location filename="mainwindow.cpp" line="438"/>
+        <location filename="mainwindow.cpp" line="425"/>
+        <location filename="mainwindow.cpp" line="457"/>
         <source>删除</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="437"/>
+        <location filename="mainwindow.cpp" line="456"/>
         <source>添加画面</source>
         <translation>Add scene</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="447"/>
-        <location filename="mainwindow.cpp" line="500"/>
+        <location filename="mainwindow.cpp" line="466"/>
+        <location filename="mainwindow.cpp" line="522"/>
         <source>添加节点</source>
         <translation>Add node</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="512"/>
+        <location filename="mainwindow.cpp" line="534"/>
         <source>已存在相同节点！</source>
         <translation>The same node already exists！</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="543"/>
+        <location filename="mainwindow.cpp" line="583"/>
         <source>已存在相同信号名称！</source>
         <translation>The same signal already exists！</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="595"/>
+        <location filename="mainwindow.cpp" line="623"/>
         <source>已存在相同画面分组！</source>
         <translation>The same scene zone already exists！</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="639"/>
+        <location filename="mainwindow.cpp" line="683"/>
         <source>tableModel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="639"/>
+        <location filename="mainwindow.cpp" line="683"/>
         <source>数据库错误</source>
-        <translation>Database Error!</translation>
+        <translation>Database Error</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="914"/>
+        <location filename="mainwindow.cpp" line="974"/>
         <source>已存在相同画面！</source>
         <translation>The same scene already exists！</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="321"/>
-        <location filename="mainwindow.cpp" line="512"/>
-        <location filename="mainwindow.cpp" line="543"/>
-        <location filename="mainwindow.cpp" line="595"/>
-        <location filename="mainwindow.cpp" line="773"/>
-        <location filename="mainwindow.cpp" line="797"/>
-        <location filename="mainwindow.cpp" line="820"/>
-        <location filename="mainwindow.cpp" line="840"/>
-        <location filename="mainwindow.cpp" line="914"/>
+        <location filename="mainwindow.cpp" line="1006"/>
+        <source>请在树上点击</source>
+        <translation>Please click on the tree</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="324"/>
+        <location filename="mainwindow.cpp" line="384"/>
+        <location filename="mainwindow.cpp" line="534"/>
+        <location filename="mainwindow.cpp" line="583"/>
+        <location filename="mainwindow.cpp" line="623"/>
+        <location filename="mainwindow.cpp" line="821"/>
+        <location filename="mainwindow.cpp" line="845"/>
+        <location filename="mainwindow.cpp" line="868"/>
+        <location filename="mainwindow.cpp" line="888"/>
+        <location filename="mainwindow.cpp" line="974"/>
+        <location filename="mainwindow.cpp" line="1006"/>
         <source>Warning</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="773"/>
-        <location filename="mainwindow.cpp" line="797"/>
-        <location filename="mainwindow.cpp" line="820"/>
-        <location filename="mainwindow.cpp" line="840"/>
+        <location filename="mainwindow.cpp" line="821"/>
+        <location filename="mainwindow.cpp" line="845"/>
+        <location filename="mainwindow.cpp" line="868"/>
+        <location filename="mainwindow.cpp" line="888"/>
         <source>请先选择画面！</source>
         <translation>Please choose scene zone firstly!</translation>
     </message>

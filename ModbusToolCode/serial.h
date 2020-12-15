@@ -18,21 +18,24 @@ class Serial :public QObject
     Q_OBJECT
 public:
     explicit Serial(QObject *parent = nullptr);
+    ~Serial();
     void open_com();
     void close_com();
     void init();
-    QSerialPort *serial;
+    QSerialPort *serial = nullptr;
     unsigned int CRC16(unsigned char *ptr, unsigned int len);
     int Read_03_04_Reg(uint ID,uint Address,uint Len,uint reg);
     int Write_10_Reg(uint ID,uint Address,QByteArray& v);
 signals:
     void Data_Updata_Signal(int);
+    void Error_Tip_Signal(QString);
 public slots:
     void doworks();
     void Stop_Thread();
 public:
+    int Scene_pos_pre = -1;
     int Scene_pos = -1;
-    uint cnt = 0;
+    int cnt = 0;
     uint outtime_cnt = 0;
     QMutex m_mutex;
     QByteArray Read_Buf;
@@ -43,6 +46,7 @@ public:
     bool START_RECEIVE_FLAG;
     bool RECEIVE_FINISH_FLAG;
     bool Write_FLAG;
+    bool READING_FLAG;
 };
 
 #endif // SERIAL_H

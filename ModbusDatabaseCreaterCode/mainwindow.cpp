@@ -373,6 +373,17 @@ void MainWindow::Signal_Menu_Action1()
 
 void MainWindow::Signal_Menu_Action2()   //删除
 {
+    QSqlQuery query(db);
+    query.prepare("select * from scene_items where signal_id = :signal_id");
+    query.bindValue(":signal_id",ui->SignalView->model()->data(ui->SignalView->model()->index(ui->SignalView->currentIndex().row(),0)));
+    if(query.exec())
+    {
+        if(query.first())
+        {
+            QMessageBox::warning(this, tr("Warning"),tr("信号已被添加到画面，请先删除画面中信号！"));
+            return;
+        }
+    }
     ModifySignalFlag = false;
     DBTableDelLine(ui->SignalView);
 }
@@ -382,6 +393,10 @@ void MainWindow::Signal_Menu_Action3()   //修改
     ModifySignalFlag = true;
     AddInfo addinfo;
     QSqlTableModel *model = dynamic_cast<QSqlTableModel *>(ui->SignalView->model());
+    while(model->canFetchMore())
+    {
+        model->fetchMore();
+    }
     addinfo.reg = model->data(model->index(ui->SignalView->currentIndex().row(),3)).toInt();
     addinfo.addr = model->data(model->index(ui->SignalView->currentIndex().row(),4)).toInt();
     addinfo.offset = model->data(model->index(ui->SignalView->currentIndex().row(),5)).toInt();
@@ -456,9 +471,12 @@ void MainWindow::Scene_Tree_Menu(const QPoint& )
 
 void MainWindow::Scene_Tree_Menu_Action1()  //添加画面
 {  
-    SceneMgrDialog *scenemgrdialog = new SceneMgrDialog(this);
-    connect(scenemgrdialog, &SceneMgrDialog::Send_Scene_Choose_Info, this, &MainWindow::Send_Scene_Choose_Info_Receive);
-    scenemgrdialog->exec();
+    if(ui->SceneTreeView->currentIndex().isValid())
+    {
+        SceneMgrDialog *scenemgrdialog = new SceneMgrDialog(this);
+        connect(scenemgrdialog, &SceneMgrDialog::Send_Scene_Choose_Info, this, &MainWindow::Send_Scene_Choose_Info_Receive);
+        scenemgrdialog->exec();
+    }
 }
 
 void MainWindow::Scene_Tree_Menu_Action2()  //删除
@@ -537,16 +555,7 @@ void MainWindow::Signal_Add_Info_Receive(QVariant& v)       //添加信号信息
     AddInfo addinfo;
     addinfo = v.value<AddInfo>();
     QSqlQuery query(db);
-    query.prepare("select * from signal where display = :display");
-    query.bindValue(":display",addinfo.display);
-    if(query.exec())
-    {
-        if(query.first())
-        {
-            QMessageBox::warning(this, tr("Warning"),tr("已存在相同信号名称！"));
-            return;
-        }
-    }
+
     if(ModifySignalFlag == true)     //修改
     {
         ModifySignalFlag = false;
@@ -564,10 +573,25 @@ void MainWindow::Signal_Add_Info_Receive(QVariant& v)       //添加信号信息
     }
     else                            //添加
     {
+        query.prepare("select * from signal where display = :display");
+        query.bindValue(":display",addinfo.display);
+        if(query.exec())
+        {
+            if(query.first())
+            {
+                QMessageBox::warning(this, tr("Warning"),tr("已存在相同信号名称！"));
+                return;
+            }
+        }
         QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->SignalView->model());
         QString Mode_Filter_pre = Mode->filter();
         DBTableAddLine(ui->SignalView);
-        QAbstractItemModel *model = ui->SignalView->model();
+        QSqlTableModel *model = dynamic_cast<QSqlTableModel *>(ui->SignalView->model());
+        while(model->canFetchMore())
+        {
+            model->fetchMore();
+        }
+        qDebug()<<"hang:"+QString::number(ui->SignalView->model()->rowCount()-1);
         model->setData(model->index(ui->SignalView->model()->rowCount()-1,1),ui->SignalZoneView->currentIndex().row());
         model->setData(model->index(ui->SignalView->model()->rowCount()-1,2),ui->SignalZoneView->currentIndex().data());
         model->setData(model->index(ui->SignalView->model()->rowCount()-1,3),addinfo.reg);
@@ -610,9 +634,17 @@ void MainWindow::Scene_Zone_Add_Info_Receive(QVariant& v)      //添加画面分
 void MainWindow::DBTableAddLine(QTableView* view)
 {
     QSqlTableModel *pMode = dynamic_cast<QSqlTableModel *>(view->model());
+    while(pMode->canFetchMore())
+    {
+        pMode->fetchMore();
+    }
     pMode->setFilter("");
     pMode->setSort(0,Qt::SortOrder::AscendingOrder);
     QSqlRecord record = pMode->record();
+    while(pMode->canFetchMore())
+    {
+        pMode->fetchMore();
+    }
     pMode->insertRecord(pMode->rowCount(),record);
     // 每次手动提交，都会重新刷新tableView，保持mode和tableView一致
     pMode->submitAll();
@@ -623,6 +655,10 @@ void MainWindow::DBTableDelLine(QTableView* view)
     QSqlTableModel *pMode = dynamic_cast<QSqlTableModel *>(view->model());
     // 当QSqlTableModel::EditStrategy 选择 非QSqlTableModel::OnManualSubmit 时,
     // 每次删除都可删除掉model，但是tableview那一列为空，一直在，只好设置为 QSqlTableModel::OnManualSubmit
+    while(pMode->canFetchMore())
+    {
+        pMode->fetchMore();
+    }
     pMode->removeRow(view->currentIndex().row());
     // 每次手动提交，都会重新刷新tableView，保持mode和tableView一致
     pMode->submitAll();
@@ -631,6 +667,10 @@ void MainWindow::DBTableDelLine(QTableView* view)
 void MainWindow::DBTableModifyLine(QTableView* view)
 {
     QSqlTableModel *pMode = dynamic_cast<QSqlTableModel *>(view->model());
+    while(pMode->canFetchMore())
+    {
+        pMode->fetchMore();
+    }
     pMode->database().transaction(); //开始事务操作
     if (pMode->submitAll()) // 提交所有被修改的数据到数据库中
     {
@@ -760,6 +800,10 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::on_SignalZoneView_clicked(const QModelIndex &index)
 {
     QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->SignalView->model());
+    while(Mode->canFetchMore())
+    {
+        Mode->fetchMore();
+    }
     Mode->setFilter("sign_zone_id = "+QString::number(index.row()));
 }
 
@@ -855,6 +899,10 @@ void MainWindow::Scene_Item_Add_Info_Receive(QString& str)
     QString sign_id,display;
     QAbstractItemModel *model = ui->SceneView->model();
     QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->SceneView->model());
+    while(Mode->canFetchMore())
+    {
+        Mode->fetchMore();
+    }
     int Scene_row_cnt = ui->SceneView->model()->rowCount();  //当前分组内容条数
     QString Mode_Filter_pre = Mode->filter();
     while(str.indexOf("(")!=-1)
@@ -872,6 +920,10 @@ void MainWindow::Scene_Item_Add_Info_Receive(QString& str)
         query.bindValue(":display",ui->SceneZoneView->currentIndex().data().toString());
         if(query.exec())
         {
+            while(Mode->canFetchMore())
+            {
+                Mode->fetchMore();
+            }
             if(query.first())
             {
                 QSqlRecord rec = query.record();
@@ -888,6 +940,10 @@ void MainWindow::Scene_Item_Add_Info_Receive(QString& str)
         query.bindValue(":sign_id",sign_id);
         if(query.exec())
         {
+            while(Mode->canFetchMore())
+            {
+                Mode->fetchMore();
+            }
             if(query.first())
             {
                 QSqlRecord rec = query.record();
@@ -922,6 +978,7 @@ void MainWindow::Send_Scene_Choose_Info_Receive(QString& str)        //节点添
     query.bindValue(":display",str);
     if(query.exec())
     {
+
         if(query.first())
         {
             QSqlRecord rec = query.record();
@@ -943,6 +1000,11 @@ void MainWindow::Send_Scene_Choose_Info_Receive(QString& str)        //节点添
         }
     }
     query.clear();
+    if(scene_mgr_id_value.isNull())
+    {
+        QMessageBox::warning(this, tr("Warning"),tr("请在树上点击"));
+        return;
+    }
     query.prepare("select * from scene_mgr where parent_id = :parent_id order by pos desc");
     query.bindValue(":parent_id",scene_mgr_id_value);
     if(query.exec())
@@ -981,12 +1043,20 @@ void MainWindow::on_SceneZoneView_clicked(const QModelIndex &index)
 {
     QVariant scene_zone_id_value;
     QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->SceneView->model());
+    while(Mode->canFetchMore())
+    {
+        Mode->fetchMore();
+    }
     Mode->setSort(5,Qt::SortOrder::AscendingOrder);
     QSqlQuery query(db);
     query.prepare("select * from scene_zone where display = :display");
     query.bindValue(":display",index.data().toString());
     if(query.exec())
     {
+        while(Mode->canFetchMore())
+        {
+            Mode->fetchMore();
+        }
         if(query.first())
         {
             QSqlRecord rec = query.record();
@@ -1002,6 +1072,10 @@ void MainWindow::on_SceneZoneView_clicked(const QModelIndex &index)
 void MainWindow::on_SceneView_clicked(const QModelIndex &index)
 {
     QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->Scene_Signal_Info_View->model());
+    while(Mode->canFetchMore())
+    {
+        Mode->fetchMore();
+    }
     Mode->setFilter("sign_id = "+ui->SceneView->model()->data(ui->SceneView->model()->index(index.row(),4)).toString());
 }
 
@@ -1165,12 +1239,24 @@ void MainWindow::on_XyButton_clicked()    //下移
 void MainWindow::on_UpdateButton_clicked()  //更新翻译
 {
     QSqlTableModel *Model = dynamic_cast<QSqlTableModel *>(ui->TranslationView->model());
+    while(Model->canFetchMore())
+    {
+        Model->fetchMore();
+    }
     int i= ui->TranslationView->model()->rowCount();
     QSqlQuery query(db);
-    QAbstractItemModel *model = ui->TranslationView->model();
+    QSqlTableModel *model = dynamic_cast<QSqlTableModel *>(ui->TranslationView->model());
+    while(model->canFetchMore())
+    {
+        model->fetchMore();
+    }
     query.prepare("select * from scene_mgr");
     if(query.exec())
     {
+        while(model->canFetchMore())
+        {
+            model->fetchMore();
+        }
         while(query.next())
         {
             QSqlQuery squery(db);
@@ -1178,6 +1264,10 @@ void MainWindow::on_UpdateButton_clicked()  //更新翻译
             squery.bindValue(":table_item_id",query.value(0));
             if(squery.exec())
             {
+                while(model->canFetchMore())
+                {
+                    model->fetchMore();
+                }
                 if(squery.first())
                 {
                     //
@@ -1197,6 +1287,10 @@ void MainWindow::on_UpdateButton_clicked()  //更新翻译
     query.prepare("select * from scene_zone");
     if(query.exec())
     {
+        while(model->canFetchMore())
+        {
+            model->fetchMore();
+        }
         while(query.next())
         {
             QSqlQuery squery(db);
@@ -1224,6 +1318,10 @@ void MainWindow::on_UpdateButton_clicked()  //更新翻译
     query.prepare("select * from signal");
     if(query.exec())
     {
+        while(model->canFetchMore())
+        {
+            model->fetchMore();
+        }
         while(query.next())
         {
             QSqlQuery squery(db);
@@ -1250,6 +1348,10 @@ void MainWindow::on_UpdateButton_clicked()  //更新翻译
     query.prepare("select * from signal where property IS NOT NULL");
     if(query.exec())
     {
+        while(model->canFetchMore())
+        {
+            model->fetchMore();
+        }
         while(query.next())
         {
             QSqlQuery squery(db);

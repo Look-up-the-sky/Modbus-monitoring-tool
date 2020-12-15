@@ -10,7 +10,7 @@ struct CommSetInfo
     uint addr;
     uint outtime;
     QString com;
-    uint Baud;
+    int Baud;
     uint date_bit;
     QString Check_bit;
     QString Stop_bit;

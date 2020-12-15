@@ -79,6 +79,10 @@ void LoginDialog::on_pushButton_2_clicked()   //登录按钮
         }
         db.close();
     }
+    if(ui->checkBox_LowFirst->checkState())
+        LowInTheFirst = true;
+    else
+        LowInTheFirst = false;
     MainWindow_k = new MainWindow;
     connect(MainWindow_k,&MainWindow::CloseSignal,this,&LoginDialog::show);
     connect(this,&LoginDialog::DbNameSignal,MainWindow_k,&MainWindow::DbNameSlot);

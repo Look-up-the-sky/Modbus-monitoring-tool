@@ -74,6 +74,10 @@ void AddSceneItemDialog::TableBindDb(QString DB)
 void AddSceneItemDialog::on_tableView_clicked(const QModelIndex &index)
 {
     QSqlTableModel *Mode = dynamic_cast<QSqlTableModel *>(ui->tableView_2->model());
+    while(Mode->canFetchMore())
+    {
+        Mode->fetchMore();
+    }
     Mode->setFilter("sign_zone_id = "+QString::number(index.row()));
 }
 

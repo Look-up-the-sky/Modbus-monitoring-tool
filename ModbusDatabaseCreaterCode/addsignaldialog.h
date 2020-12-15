@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QVariant>
 #include <QMessageBox>
-
-
+#include <QKeyEvent>
+#include <QDebug>
 struct AddInfo
 {
     int sign_id;
@@ -36,6 +36,10 @@ public:
     explicit AddSignalDialog(QWidget *parent = nullptr);
     ~AddSignalDialog();
     QStringList Signal_Info_Property(QString s);
+    void Copy();
+    void Paste();
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
 signals:
     void AddInfoSignal(QVariant&);

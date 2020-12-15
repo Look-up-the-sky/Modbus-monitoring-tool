@@ -24,6 +24,7 @@ public:
     void GetAllDbName();
     QStringList string_list;
     static uint Language;
+    static bool LowInTheFirst;
 signals:
     void DbNameSignal(QString);
 

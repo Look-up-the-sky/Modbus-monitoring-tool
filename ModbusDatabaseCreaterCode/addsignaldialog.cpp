@@ -1,5 +1,7 @@
 #include "addsignaldialog.h"
 #include "ui_addsignaldialog.h"
+#include <QClipboard>
+#include <QStandardItem>
 
 AddSignalDialog::AddSignalDialog(QWidget *parent) :
     QDialog(parent),
@@ -20,8 +22,102 @@ AddSignalDialog::~AddSignalDialog()
     delete ui;
 }
 
+void AddSignalDialog::Copy()  //复制
+{
+    QList<QTableWidgetSelectionRange> selectionList = ui->tableWidget_enum->selectedRanges();
+    if(selectionList.count() == 0)
+        return;
+    //获取选中的最大范围
+    int minLeft = selectionList.first().leftColumn();
+    int minTop = selectionList.first().topRow();
+    int maxRight = selectionList.first().rightColumn();
+    int maxBottom = selectionList.first().bottomRow();
+
+    foreach(QTableWidgetSelectionRange range,selectionList)
+    {
+        minLeft = range.leftColumn() < minLeft ? range.leftColumn():minLeft;
+        minTop = range.topRow() < minTop ? range.topRow():minTop;
+        maxRight = range.rightColumn() > maxRight ? range.rightColumn():maxRight;
+        maxBottom = range.bottomRow() > maxBottom ? range.bottomRow():maxBottom;
+    }
+
+    //获取文本
+    QList<QTableWidgetItem*> selItems = ui->tableWidget_enum->selectedItems();
+    QString selectionStr;
+    for(int i = minTop; i <= maxBottom; i++)
+    {
+        for(int j = minLeft; j <= maxRight; ++j)
+        {
+            if(selItems.contains((ui->tableWidget_enum->item(i,j))))
+            {
+                selectionStr += ui->tableWidget_enum->item(i,j)->text();
+            }
+            else {
+                selectionStr += "";
+            }
+            if(j < maxRight)
+            {
+                selectionStr += "\t";
+            }
+        }
+        if(i <= maxBottom)
+        {
+            selectionStr += "\n";
+        }
+    }
+
+    //剪贴板
+    QClipboard* clipboard = QApplication::clipboard();
+    clipboard->setText(selectionStr);
+}
+
+void AddSignalDialog::Paste()  //粘贴
+{
+    QClipboard* clipboard = QApplication::clipboard();
+    QString text = clipboard->text(); //获取剪贴板复制过来的文本
+    QModelIndex curindex = ui->tableWidget_enum->currentIndex();
+    if (!curindex.isValid())
+        return;
+    int currow = curindex.row();
+    int curcol = curindex.column();
+    QStringList strList = text.split("\n"); //获取每行的数据
+    foreach(const QString& linestr, strList)
+    {
+        if (linestr.isEmpty())
+            continue;
+        QStringList rowCells = linestr.split("\t"); //获取每个单元格的数据
+        if (rowCells.size() > 2)
+            return;
+        int allowedIndexRange = ui->tableWidget_enum->model()->columnCount() - rowCells.size();
+        if (curcol > allowedIndexRange)
+            return;
+        int col = curcol;
+        foreach(const QString cell, rowCells)
+        {
+            QTableWidgetItem* item = new QTableWidgetItem();
+            item->setText(cell);
+            ui->tableWidget_enum->setItem(currow, col,item);
+            col++;
+        }
+        currow++;
+    }
+}
+
+void AddSignalDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_C && event->modifiers() == Qt::ControlModifier)  //复制
+    {
+        Copy();
+    }
+    else if (event->key() == Qt::Key_V && event->modifiers() == Qt::ControlModifier) //粘贴
+    {
+        Paste();
+    }
+}
+
 void AddSignalDialog::Modify_Signal_Info_Receive(QVariant v)
 {
+    ui->lineEdit_miaoshu->setEnabled(false);
     AddInfo addinfo;
     addinfo = v.value<AddInfo>();
     ui->comboBox_reg->setCurrentText(QString::number(addinfo.reg));

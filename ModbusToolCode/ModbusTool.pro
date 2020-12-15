@@ -31,20 +31,23 @@ SOURCES += \
     commsetdialog.cpp \
     serial.cpp \
     logindialog.cpp \
-    chooseenumitemdialog.cpp
+    chooseenumitemdialog.cpp \
+    datatimedialog.cpp
 
 HEADERS += \
         mainwindow.h \
     commsetdialog.h \
     serial.h \
     logindialog.h \
-    chooseenumitemdialog.h
+    chooseenumitemdialog.h \
+    datatimedialog.h
 
 FORMS += \
         mainwindow.ui \
     commsetdialog.ui \
     logindialog.ui \
-    chooseenumitemdialog.ui
+    chooseenumitemdialog.ui \
+    datatimedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

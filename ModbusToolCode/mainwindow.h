@@ -3,16 +3,19 @@
 
 #include <QMainWindow>
 #include "commsetdialog.h"
+#include <QLabel>
 #include <QProgressBar>
 #include <QSqlDatabase>
 #include <QTranslator>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QDateTime>
 #include <QThread>
 #include <QSqlTableModel>
 #include <QStandardItemModel>
 #include "serial.h"
 #include "chooseenumitemdialog.h"
+#include "datatimedialog.h"
 
 struct Signal_Info
 {
@@ -48,7 +51,7 @@ public:
     static uint addr;
     static uint outtime;
     static QString com;
-    static uint Baud;
+    static int Baud;
     static QString DbName;
     static QList<uint> scene_items_num_list;  //每个画面的内容数（画面不重复）
     static QList<Signal_Info> Signal_info_list;
@@ -56,6 +59,7 @@ public:
     QList<uint> scene_in_use_id;
     static Signal_Info Clicked_Signal;
     static QByteArray Write_Value;
+    QLabel *error_tip_label;
     QProgressBar *progressbar;
     QSqlDatabase db;
     int curr_progressbar_maxinum = 0;
@@ -80,7 +84,9 @@ public slots:
     void Comm_Set_Info_Receive(QVariant& v);
     void DbNameSlot(QString arg);
     void Data_Updata_Slot(int cnt);
+    void Error_Tip_Slot(QString str);
     void Property_Choice_Receive(QString s);
+    void DataTime_Slot(QDateTime datatime);
 private slots:
     void on_CommAction_triggered();
 
